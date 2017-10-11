@@ -1,0 +1,76 @@
+---
+title: "10-9/11 In-class Practice"
+author: "Boxuan Li"
+date: "2017/10/9"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(haven)
+library(readxl)
+library(janitor)
+library(tidyverse)
+library(ggridges)
+library(ggthemes)
+library(hexbin)
+library(rnoaa)
+library(forcats)
+
+options(tibble.print_min = 10)
+```
+
+```{r, message=FALSE}
+airbnb_data = read_csv("../data/nyc_airbnb.zip") %>%
+  clean_names()
+```
+
+# View the structure and dataset
+```{r}
+airbnb_data %>%
+  str() 
+
+View(airbnb_data)
+```
+
+__Does rating vary by neighborhood, room type, or both?__
+```{r}
+airbnb_data %>%
+  group_by(., neighbourhood_group, room_type) %>% # group by only one factor to check the connection of that factor to rating.
+  summarize(., rating.average = round(mean(review_scores_location, na.rm = TRUE),2), rating.median = round(median(review_scores_location, na.rm = TRUE),2), rating.sd = round(sd(review_scores_location, na.rm = TRUE),2)) %>%
+  arrange(., desc(rating.average), desc(rating.median), rating.sd)
+  
+airbnb_data %>%
+  group_by(., neighbourhood_group) %>%
+  ggplot(., aes(x = neighbourhood_group, y = review_scores_location, color = neighbourhood_group)) +
+  geom_violin(alpha = 0.5, bw = 0.1)
+```
+
+__Do hosts with more listings have higher or lower ratings?__
+```{r}
+airbnb_data %>%
+  group_by(host_id) %>%
+  summarize(., no.listing = n(), average.rating = round(mean(review_scores_location, na.rm = TRUE), 2)) %>%
+  arrange(desc(no.listing)) %>%
+  ggplot(., aes(x = no.listing, y = average.rating, color = no.listing)) + 
+  geom_point(alpha = 0.5) +
+  geom_smooth()
+```
+
+__How is price related to other variables?__
+__Where are rentals located?__
+```{r}
+airbnb_data %>%
+  ggplot(., aes(x = longitude, y = latitude, color = neighbourhood_group)) +
+  geom_point(alpha = 0.4)
+```
+
+#Git Sample#
+```{r}
+# this is some changes
+
+airbnb_data %>%
+  ggplot(., aes(x = calculated_host_listings_count, y = review_scores_location, color = neighbourhood_group)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth()
+```
