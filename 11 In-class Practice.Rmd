@@ -72,5 +72,6 @@ airbnb_data %>%
 airbnb_data %>%
   ggplot(., aes(x = calculated_host_listings_count, y = review_scores_location, color = neighbourhood_group)) +
   geom_point(alpha = 0.4) +
-  geom_smooth()
 ```
+
+__Whetehr there are any changes in this line?
